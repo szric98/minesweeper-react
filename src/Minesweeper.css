@@ -67,6 +67,10 @@
   background-position: -64px -39px;
 }
 
+.triggeredDeath {
+  background-position: -32px -39px;
+}
+
 button {
   align-items: flex-start;
 }

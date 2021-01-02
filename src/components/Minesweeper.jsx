@@ -3,12 +3,31 @@ import Tile from "./Tile";
 import shuffle from "../utils/utils";
 import Indicator from "./Indicator";
 
+const difficulty = {
+  beginner: {
+    mines: 10,
+    size: { x: 9, y: 9 },
+    count: 81,
+  },
+  intermediate: {
+    mines: 40,
+    size: { x: 16, y: 16 },
+    count: 256,
+  },
+  advanced: {
+    mines: 99,
+    size: { x: 16, y: 32 },
+    count: 512,
+  },
+};
 class Minesweeper extends Component {
   state = {
     tiles: [],
-    hiddenTilesCount: 81,
+    difficulty: difficulty.beginner,
+    hiddenTilesCount: difficulty.beginner.count,
     time: 0,
     flags: 0,
+    gameState: "",
   };
 
   constructor() {
@@ -17,14 +36,21 @@ class Minesweeper extends Component {
   }
 
   handleClick = (tile) => {
-    if (tile.hasMine) return console.log("game over");
+    if (tile.hasMine) return this.gameOver(tile.pos);
     this.floodFill(tile.pos.x, tile.pos.y, 0);
-    if (this.countHiddenFields() === 9) return console.log("you won");
+    if (this.countHiddenFields() === 9) this.setState({ gameState: "win" });
   };
 
   handleReset = () => {
     const tiles = this.initBoard();
-    const initialState = { tiles, hiddenTilesCount: 81, time: 0, flags: 0 };
+    const initialState = {
+      tiles,
+      difficulty: difficulty.beginner,
+      hiddenTilesCount: difficulty.beginner.count,
+      time: 0,
+      flags: 0,
+      gameState: "",
+    };
     this.setState(initialState);
   };
 
@@ -35,6 +61,7 @@ class Minesweeper extends Component {
           flags={this.state.flags}
           time={this.state.time}
           onReset={this.handleReset}
+          gameState={this.state.gameState}
         />
         <div className="board">
           {this.state.tiles.map((row, index) => (
@@ -45,6 +72,7 @@ class Minesweeper extends Component {
                   classes={tile.classes}
                   hidden={tile.hidden}
                   onClick={() => this.handleClick(tile)}
+                  gameState={this.state.gameState}
                 />
               ))}
             </div>
@@ -56,12 +84,15 @@ class Minesweeper extends Component {
 
   initBoard() {
     const tiles = [];
-    const array = [...Array(81).keys()];
-    const indexes = shuffle(array).slice(0, 9);
+    const { difficulty } = this.state;
+    const size_x = difficulty.size.x;
+    const size_y = difficulty.size.y;
+    const array = [...Array(difficulty.count).keys()];
+    const indexes = shuffle(array).slice(0, difficulty.mines);
 
-    for (let x = 0; x < 9; x++) {
+    for (let x = 0; x < size_x; x++) {
       let row = [];
-      for (let y = 0; y < 9; y++) {
+      for (let y = 0; y < size_y; y++) {
         row.push({
           pos: { x, y },
           hasMine: indexes.find((index) => index === x * 10 + y) !== undefined,
@@ -73,8 +104,8 @@ class Minesweeper extends Component {
       tiles.push(row);
     }
 
-    for (let i = 0; i < 9; i++) {
-      for (let j = 0; j < 9; j++) {
+    for (let i = 0; i < size_x; i++) {
+      for (let j = 0; j < size_y; j++) {
         if (tiles[i][j].hasMine) tiles[i][j].classes += " mine";
         else
           tiles[i][j].classes += ` n${this.countSurroundingMines(
@@ -109,11 +140,12 @@ class Minesweeper extends Component {
 
   floodFill(x, y, prevCount) {
     const tiles = [...this.state.tiles];
+    const size = this.state.difficulty.size;
     if (
       x >= 0 &&
-      x < 9 &&
+      x < size.x &&
       y >= 0 &&
-      y < 9 &&
+      y < size.y &&
       tiles[x][y].hidden &&
       prevCount === 0
     ) {
@@ -130,11 +162,31 @@ class Minesweeper extends Component {
   }
 
   countHiddenFields() {
+    const size = this.state.difficulty.size;
     let count = 0;
-    for (let i = 0; i < 9; i++)
-      for (let j = 0; j < 9; j++) if (this.state.tiles[i][j].hidden) count++;
+    for (let x = 0; x < size.x; x++)
+      for (let y = 0; y < size.y; y++)
+        if (this.state.tiles[x][y].hidden) count++;
 
     return count;
+  }
+
+  gameOver(trigger) {
+    this.revealMines(trigger);
+    this.setState({ gameState: "dead" });
+  }
+
+  revealMines(trigger) {
+    const tiles = [...this.state.tiles];
+    const size = this.state.difficulty.size;
+    for (let x = 0; x < size.x; x++) {
+      for (let y = 0; y < size.y; y++) {
+        if (tiles[x][y].hasMine) tiles[x][y].hidden = false;
+        if (x === trigger.x && y === trigger.y)
+          tiles[x][y].classes += " triggeredDeath";
+      }
+    }
+    this.setState({ tiles });
   }
 }
 
