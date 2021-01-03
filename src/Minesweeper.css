@@ -27,6 +27,10 @@
   background-position: 0px -23px;
 }
 
+.flag {
+  background-position: -16px -39px;
+}
+
 .n0 {
   background-position: 0px -23px;
 }
@@ -71,6 +75,10 @@
   background-position: -32px -39px;
 }
 
+.dead-flag {
+  background-position: -48px -39px;
+}
+
 button {
   align-items: flex-start;
 }
@@ -113,10 +121,10 @@ button {
   background-position-x: -26px;
 }
 .indicator .time {
-  float: left;
+  float: right;
 }
 .indicator .flags-counter {
-  float: right;
+  float: left;
 }
 
 .indicator .count {

@@ -26,7 +26,7 @@ class Minesweeper extends Component {
     difficulty: difficulty.beginner,
     hiddenTilesCount: difficulty.beginner.count,
     time: 0,
-    flags: 0,
+    flags: difficulty.beginner.mines,
     gameState: "",
   };
 
@@ -37,9 +37,28 @@ class Minesweeper extends Component {
 
   handleClick = (tile) => {
     if (this.state.gameState === "") this.setState({ gameState: "started" });
+    if (tile.hasFlag) return;
     if (tile.hasMine) return this.gameOver(tile.pos);
     this.floodFill(tile.pos.x, tile.pos.y, 0);
     if (this.countHiddenFields() === 9) this.setState({ gameState: "win" });
+  };
+
+  handleRightClick = (e, tile) => {
+    e.preventDefault();
+    if (!tile.hidden || (this.state.flags === 0 && !tile.hasFlag)) return;
+
+    const tiles = [...this.state.tiles];
+    const flags = this.state.flags;
+
+    if (tile.hasFlag) {
+      tiles[tile.pos.x][tile.pos.y].hasFlag = false;
+      this.setState({ flags: flags + 1 });
+    } else {
+      tiles[tile.pos.x][tile.pos.y].hasFlag = true;
+      this.setState({ flags: flags - 1 });
+    }
+
+    this.setState({ tiles });
   };
 
   handleReset = () => {
@@ -49,7 +68,7 @@ class Minesweeper extends Component {
       difficulty: difficulty.beginner,
       hiddenTilesCount: difficulty.beginner.count,
       time: 0,
-      flags: 0,
+      flags: difficulty.beginner.mines,
       gameState: "",
     };
     this.setState(initialState);
@@ -74,6 +93,8 @@ class Minesweeper extends Component {
                   hidden={tile.hidden}
                   onClick={() => this.handleClick(tile)}
                   gameState={this.state.gameState}
+                  onContextMenu={(e) => this.handleRightClick(e, tile)}
+                  hasFlag={tile.hasFlag}
                 />
               ))}
             </div>
@@ -150,7 +171,7 @@ class Minesweeper extends Component {
       tiles[x][y].hidden &&
       prevCount === 0
     ) {
-      if (!tiles[x][y].hasMine) {
+      if (!tiles[x][y].hasMine && !tiles[x][y].hasFlag) {
         tiles[x][y].hidden = false;
         let count = this.countSurroundingMines(tiles[x][y], tiles);
         this.floodFill(x - 1, y, count);
@@ -182,7 +203,12 @@ class Minesweeper extends Component {
     const size = this.state.difficulty.size;
     for (let x = 0; x < size.x; x++) {
       for (let y = 0; y < size.y; y++) {
-        if (tiles[x][y].hasMine) tiles[x][y].hidden = false;
+        if (!tiles[x][y].hasFlag && tiles[x][y].hasMine)
+          tiles[x][y].hidden = false;
+        if (tiles[x][y].hasFlag && !tiles[x][y].hasMine) {
+          tiles[x][y].hidden = false;
+          tiles[x][y].classes += " dead-flag";
+        }
         if (x === trigger.x && y === trigger.y)
           tiles[x][y].classes += " triggeredDeath";
       }
