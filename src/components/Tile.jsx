@@ -5,7 +5,7 @@ const Tile = ({ classes, hidden, onClick, gameState }) => {
     <button
       className={hidden ? "cell" : classes}
       onClick={onClick}
-      disabled={gameState}
+      disabled={gameState === "win" || gameState === "dead"}
     ></button>
   );
 };

@@ -36,6 +36,7 @@ class Minesweeper extends Component {
   }
 
   handleClick = (tile) => {
+    if (this.state.gameState === "") this.setState({ gameState: "started" });
     if (tile.hasMine) return this.gameOver(tile.pos);
     this.floodFill(tile.pos.x, tile.pos.y, 0);
     if (this.countHiddenFields() === 9) this.setState({ gameState: "win" });
