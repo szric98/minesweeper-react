@@ -118,7 +118,8 @@ class Minesweeper extends Component {
       for (let y = 0; y < size_y; y++) {
         row.push({
           pos: { x, y },
-          hasMine: indexes.find((index) => index === x * 10 + y) !== undefined,
+          hasMine:
+            indexes.find((index) => index === x * size_x + y) !== undefined,
           hasFlag: false,
           classes: "cell",
           hidden: true,
@@ -126,6 +127,8 @@ class Minesweeper extends Component {
       }
       tiles.push(row);
     }
+
+    console.log(tiles);
 
     for (let i = 0; i < size_x; i++) {
       for (let j = 0; j < size_y; j++) {
