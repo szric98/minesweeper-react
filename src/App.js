@@ -1,4 +1,3 @@
-import "./App.css";
 import Minesweeper from "./components/Minesweeper";
 import "./Minesweeper.css";
 

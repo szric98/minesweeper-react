@@ -45,10 +45,11 @@ class Minesweeper extends Component {
 
   handleRightClick = (e, tile) => {
     e.preventDefault();
-    if (!tile.hidden || (this.state.flags === 0 && !tile.hasFlag)) return;
+    const flags = this.state.flags;
+
+    if (!tile.hidden || (flags === 0 && !tile.hasFlag)) return;
 
     const tiles = [...this.state.tiles];
-    const flags = this.state.flags;
 
     if (tile.hasFlag) {
       tiles[tile.pos.x][tile.pos.y].hasFlag = false;
