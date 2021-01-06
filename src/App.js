@@ -22,7 +22,7 @@ const levels = {
 };
 
 function App() {
-  const [difficulty, setDifficulty] = useState(levels.intermediate);
+  const [difficulty, setDifficulty] = useState(levels.beginner);
 
   const handleMenuItemClick = (id) => {
     if (id === "beginner") {
@@ -32,7 +32,6 @@ function App() {
     } else if (id === "advanced") {
       setDifficulty(levels.advanced);
     }
-    console.log(difficulty);
   };
 
   return (
