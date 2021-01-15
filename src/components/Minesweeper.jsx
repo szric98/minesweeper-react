@@ -23,9 +23,6 @@ class Minesweeper extends Component {
     if (prevProps !== this.props) this.handleReset();
   }
 
-  // if hasMine and first click
-  //   iterate over the generated array and find the first one
-
   handleClick = (tile) => {
     if (!tile.hidden) {
       this.openAdjacentFields(tile);
@@ -47,8 +44,7 @@ class Minesweeper extends Component {
     }
   };
 
-  handleRightClick = (e, tile) => {
-    e.preventDefault();
+  handleRightClick = (tile) => {
     const flags = this.state.flags;
 
     if (!tile.hidden || (flags === 0 && !tile.hasFlag)) return;
@@ -80,7 +76,7 @@ class Minesweeper extends Component {
 
   render() {
     return (
-      <div className="minesweeper">
+      <div className="minesweeper" onContextMenu={(e) => e.preventDefault()}>
         <Indicator
           flags={this.state.flags}
           time={this.state.time}
@@ -97,7 +93,7 @@ class Minesweeper extends Component {
                   hidden={tile.hidden}
                   onClick={() => this.handleClick(tile)}
                   gameState={this.state.gameState}
-                  onContextMenu={(e) => this.handleRightClick(e, tile)}
+                  onContextMenu={() => this.handleRightClick(tile)}
                   hasFlag={tile.hasFlag}
                 />
               ))}
@@ -199,7 +195,7 @@ class Minesweeper extends Component {
         this.floodFill(x + 1, y, count);
         this.floodFill(x, y - 1, count);
         this.floodFill(x, y + 1, count);
-      }
+      } else if (tiles[x][y].hasMine) this.gameOver(tiles[x][y]);
     }
     this.setState({ tiles });
   }
