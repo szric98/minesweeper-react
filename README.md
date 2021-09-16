@@ -1,4 +1,3 @@
-# Retro Minesweeper with React
+# [Retro Minesweeper with React](https://riyomi.github.io/minesweeper-react/)
 
-## Link
-The app is available at https://riyomi.github.io/minesweeper-react/
+![](https://i.imgur.com/PEkNiHx.jpg)
